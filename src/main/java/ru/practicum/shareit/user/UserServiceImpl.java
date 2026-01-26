@@ -24,6 +24,12 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("Некорректный email");
         }
 
+        boolean emailExists = userRepository.findAll().stream()
+                .anyMatch(user -> user.getEmail().equals(userDto.getEmail()));
+        if (emailExists) {
+            throw new ValidationException("Пользователь с таким email уже существует");
+        }
+
         User user = userMapper.toEntity(userDto);
         User savedUser = userRepository.save(user);
         return userMapper.toDto(savedUser);
@@ -32,6 +38,14 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(Long userId, UserDto userDto) {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+
+        if (userDto.getEmail() != null && !userDto.getEmail().equals(existingUser.getEmail())) {
+            boolean emailExists = userRepository.findAll().stream()
+                    .anyMatch(user -> user.getEmail().equals(userDto.getEmail()));
+            if (emailExists) {
+                throw new ValidationException("Пользователь с таким email уже существует");
+            }
+        }
 
         if (userDto.getName() != null) {
             existingUser.setName(userDto.getName());
