@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -20,7 +19,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     // Переписана валидация
-    public ItemDto createItem(Long userId, @Valid ItemDto itemDto) {
+    public ItemDto createItem(Long userId, ItemDto itemDto) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
@@ -32,7 +31,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     // Переписана валидация
-    public ItemDto updateItem(Long userId, Long itemId, @Valid ItemDto itemDto) {
+    public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
         Item existingItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
