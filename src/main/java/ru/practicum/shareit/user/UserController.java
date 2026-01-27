@@ -22,7 +22,7 @@ public class UserController {
 
     // Добавлена аннотация @Valid
     @PatchMapping("/{userId}")
-    public UserDto updateUser( @PathVariable Long userId, @Valid @RequestBody UserDto userDto) {
+    public UserDto updateUser(@PathVariable Long userId,@Valid @RequestBody UserDto userDto) {
         return userService.updateUser(userId, userDto);
     }
 
