@@ -4,9 +4,8 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
+// Добрый день! Постаралась учесть в коде все комментарии
+
 @Data
 public class Booking {
     private Long id;

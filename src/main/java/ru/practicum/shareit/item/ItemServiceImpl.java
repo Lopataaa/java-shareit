@@ -1,9 +1,9 @@
 package ru.practicum.shareit.item;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.InMemoryUserRepository;
@@ -19,19 +19,11 @@ public class ItemServiceImpl implements ItemService {
     private final InMemoryUserRepository userRepository;
     private final ItemMapper itemMapper;
 
-    public ItemDto createItem(Long userId, ItemDto itemDto) {
+    // Переписана валидация
+    public ItemDto createItem(Long userId, @Valid ItemDto itemDto) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
-        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
-            throw new ValidationException("Название не может быть пустым");
-        }
-        if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
-            throw new ValidationException("Описание не может быть пустым");
-        }
-        if (itemDto.getAvailable() == null) {
-            throw new ValidationException("Статус доступности должен быть указан");
-        }
 
         Item item = itemMapper.toEntity(itemDto);
         item.setOwnerId(userId);
@@ -39,7 +31,8 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.toDto(savedItem);
     }
 
-    public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
+    // Переписана валидация
+    public ItemDto updateItem(Long userId, Long itemId, @Valid ItemDto itemDto) {
         Item existingItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
