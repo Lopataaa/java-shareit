@@ -5,20 +5,22 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 @Component
 public class UserMapper {
+
     public UserDto toDto(User user) {
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        return dto;
+        if (user == null) {
+            return null;
+        }
+        return new UserDto(user.getId(), user.getName(), user.getEmail());
     }
 
     public User toEntity(UserDto userDto) {
-        User user = new User();
-        user.setId(userDto.getId());
-        user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
-        return user;
+        if (userDto == null) {
+            return null;
+        }
+        return User.builder()
+                .id(userDto.getId())
+                .name(userDto.getName())
+                .email(userDto.getEmail())
+                .build();
     }
 }
-
