@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    // Теперь ownerId - это просто Long поле, а не связь
     List<Item> findByOwnerId(Long ownerId);
 
     @Query("SELECT i FROM Item i " +

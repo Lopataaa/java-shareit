@@ -2,6 +2,9 @@ package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+//import ru.practicum.shareit.booking.Booking;
+//
+//import java.util.List;
 
 @Entity
 @Table(name = "items")
@@ -32,4 +35,7 @@ public class Item {
 
     @Column(name = "request_id")
     private Long requestId;
+
+//    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
+//    private List<Booking> bookings;
 }

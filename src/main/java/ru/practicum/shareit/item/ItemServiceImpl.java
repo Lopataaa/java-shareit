@@ -29,10 +29,8 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Пользователь с ID " + userId + " не найден");
         }
 
-        // Валидация данных
         validateItemDto(itemDto);
 
-        // Устанавливаем владельца из заголовка
         itemDto.setOwnerId(userId);
 
         Item item = itemMapper.toEntity(itemDto);
