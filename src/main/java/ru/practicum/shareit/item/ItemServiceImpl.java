@@ -4,13 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
 import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +26,9 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final ItemMapper itemMapper;
+    private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
+    private final BookingRepository bookingRepository;
 
     @Override
     @Transactional
@@ -112,5 +119,30 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() == null) {
             throw new ValidationException("Статус доступности не может быть null");
         }
+    }
+
+    @Override
+    @Transactional
+    public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
+        // Проверяем существование пользователя и вещи
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
+
+        // Проверяем, что пользователь брал эту вещь в аренду
+        LocalDateTime now = LocalDateTime.now();
+        boolean hasUserBookedItem = bookingRepository.hasUserBookedItem(itemId, userId, now);
+
+        if (!hasUserBookedItem) {
+            throw new ValidationException("Пользователь не брал эту вещь в аренду");
+        }
+
+        // Создаем и сохраняем комментарий
+        Comment comment = commentMapper.toEntity(commentDto, itemId, userId);
+        Comment savedComment = commentRepository.save(comment);
+
+        return commentMapper.toDto(savedComment);
     }
 }

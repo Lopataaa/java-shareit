@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -28,9 +30,10 @@ public class ItemDto {
     private Long requestId;
     private BookingShortDto lastBooking;
     private BookingShortDto nextBooking;
+    private List<CommentDto> comments;
 
     public ItemDto(Long id, String name, String description, Boolean available,
                    Long ownerId, Long requestId) {
-        this(id, name, description, available, ownerId, requestId, null, null);
+        this(id, name, description, available, ownerId, requestId, null, null, null);
     }
 }
