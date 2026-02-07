@@ -3,11 +3,13 @@ package ru.practicum.shareit.item.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
@@ -26,4 +28,9 @@ public class ItemDto {
     private Long requestId;
     private BookingShortDto lastBooking;
     private BookingShortDto nextBooking;
+
+    public ItemDto(Long id, String name, String description, Boolean available,
+                   Long ownerId, Long requestId) {
+        this(id, name, description, available, ownerId, requestId, null, null);
+    }
 }

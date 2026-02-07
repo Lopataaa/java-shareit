@@ -156,7 +156,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         // Проверка, что у пользователя есть вещи
-        if (itemRepository.findByOwnerId(userId).isEmpty()) {
+        if (itemRepository.findByOwnerId(userId, Pageable.unpaged()).isEmpty()) {
             throw new AccessDeniedException("User has no items");
         }
 

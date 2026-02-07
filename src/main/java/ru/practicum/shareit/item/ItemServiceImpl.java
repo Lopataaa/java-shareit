@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -9,6 +10,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,18 +26,17 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto createItem(Long userId, ItemDto itemDto) {
-        // Проверка существования пользователя
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Пользователь с ID " + userId + " не найден");
         }
 
         validateItemDto(itemDto);
 
-        itemDto.setOwnerId(userId);
-
         Item item = itemMapper.toEntity(itemDto);
+        item.setOwnerId(userId);
         Item savedItem = itemRepository.save(item);
-        return itemMapper.toDto(savedItem);
+
+        return itemMapper.toDto(savedItem, userId);
     }
 
     @Override
@@ -44,12 +45,10 @@ public class ItemServiceImpl implements ItemService {
         Item existingItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь с ID " + itemId + " не найдена"));
 
-        // Проверка, что пользователь является владельцем
         if (!existingItem.getOwnerId().equals(userId)) {
             throw new NotFoundException("Нельзя обновить чужую вещь");
         }
 
-        // Обновление полей, если переданы
         if (itemDto.getName() != null && !itemDto.getName().isBlank()) {
             existingItem.setName(itemDto.getName());
         }
@@ -61,36 +60,45 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Item updatedItem = itemRepository.save(existingItem);
-        return itemMapper.toDto(updatedItem);
+        return itemMapper.toDto(updatedItem, userId);
     }
 
     @Override
-    public ItemDto getItemById(Long itemId) {
+    public ItemDto getItemById(Long itemId, Long userId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Вещь с ID " + itemId + " не найдена"));
-        return itemMapper.toDto(item);
+                .orElseThrow(() -> new NotFoundException("Item not found"));
+        return itemMapper.toDto(item, userId);
     }
 
     @Override
-    public List<ItemDto> getItemsByOwner(Long userId) {
-        // Проверка существования пользователя
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("Пользователь с ID " + userId + " не найден");
+    public List<ItemDto> getAllItemsByOwner(Long ownerId, int from, int size) {
+        if (from < 0 || size <= 0) {
+            throw new ValidationException("Некорректные параметры пагинации");
         }
 
-        return itemRepository.findByOwnerId(userId).stream()
-                .map(itemMapper::toDto)
+        Pageable pageable = PageRequest.of(from / size, size);
+        List<Item> items = itemRepository.findByOwnerId(ownerId, pageable);
+
+        return items.stream()
+                .map(item -> itemMapper.toDto(item, ownerId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemDto> searchItems(String text) {
+    public List<ItemDto> searchItems(String text, int from, int size) {
         if (text == null || text.isBlank()) {
             return List.of();
         }
 
-        return itemRepository.searchItems(text).stream()
-                .map(itemMapper::toDto)
+        if (from < 0 || size <= 0) {
+            throw new ValidationException("Некорректные параметры пагинации");
+        }
+
+        Pageable pageable = PageRequest.of(from / size, size);
+        List<Item> items = itemRepository.searchItems(text, pageable);
+
+        return items.stream()
+                .map(item -> itemMapper.toDto(item, null))
                 .collect(Collectors.toList());
     }
 
