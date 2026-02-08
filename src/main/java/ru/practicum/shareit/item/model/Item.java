@@ -35,7 +35,4 @@ public class Item {
 
     @Column(name = "request_id")
     private Long requestId;
-
-//    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
-//    private List<Booking> bookings;
 }
