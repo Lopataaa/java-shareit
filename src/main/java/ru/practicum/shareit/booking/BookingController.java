@@ -6,6 +6,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
@@ -21,49 +22,53 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public BookingResponseDto createBooking(
+    public ResponseEntity<BookingResponseDto> createBooking(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @Valid @RequestBody BookingRequestDto bookingRequestDto) {
-        log.info("POST /bookings - create booking for user {}", userId);
-        return bookingService.createBooking(userId, bookingRequestDto);
+        log.info("POST /bookings - создание бронирования для пользователя {}", userId);
+        BookingResponseDto response = bookingService.createBooking(userId, bookingRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingResponseDto updateBookingStatus(
+    public ResponseEntity<BookingResponseDto> updateBookingStatus(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long bookingId,
             @RequestParam Boolean approved) {
-        log.info("PATCH /bookings/{} - update status to {} by user {}",
+        log.info("PATCH /bookings/{} - обновление статуса на {} пользователем {}",
                 bookingId, approved, userId);
-        return bookingService.updateBookingStatus(userId, bookingId, approved);
+        BookingResponseDto response = bookingService.updateBookingStatus(userId, bookingId, approved);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingResponseDto getBookingById(
+    public ResponseEntity<BookingResponseDto> getBookingById(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long bookingId) {
-        log.info("GET /bookings/{} - get booking by user {}", bookingId, userId);
-        return bookingService.getBookingById(userId, bookingId);
+        log.info("GET /bookings/{} - получение бронирования пользователем {}", bookingId, userId);
+        BookingResponseDto response = bookingService.getBookingById(userId, bookingId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public List<BookingResponseDto> getUserBookings(
+    public ResponseEntity<List<BookingResponseDto>> getUserBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
             @RequestParam(defaultValue = "10") @Positive int size) {
-        log.info("GET /bookings?state={} - get bookings for user {}", state, userId);
-        return bookingService.getUserBookings(userId, state, from, size);
+        log.info("GET /bookings?state={} - получение бронирований пользователя {}", state, userId);
+        List<BookingResponseDto> response = bookingService.getUserBookings(userId, state, from, size);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/owner")
-    public List<BookingResponseDto> getOwnerBookings(
+    public ResponseEntity<List<BookingResponseDto>> getOwnerBookings(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
             @RequestParam(defaultValue = "10") @Positive int size) {
-        log.info("GET /bookings/owner?state={} - get owner bookings for user {}", state, userId);
-        return bookingService.getOwnerBookings(userId, state, from, size);
+        log.info("GET /bookings/owner?state={} - получение бронирований владельца {}", state, userId);
+        List<BookingResponseDto> response = bookingService.getOwnerBookings(userId, state, from, size);
+        return ResponseEntity.ok(response);
     }
 }

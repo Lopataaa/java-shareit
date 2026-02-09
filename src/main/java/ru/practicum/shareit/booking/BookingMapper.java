@@ -1,29 +1,17 @@
 package ru.practicum.shareit.booking;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserRepository;
 
 @Component
-@RequiredArgsConstructor
 public class BookingMapper {
-
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
-    private final UserMapper userMapper;
-    private final ItemMapper itemMapper;
 
     public Booking toEntity(BookingRequestDto dto, Long bookerId) {
         if (dto == null) {
-            return null;
+            throw new IllegalArgumentException("BookingRequestDto не может быть null");
         }
 
         return Booking.builder()
@@ -35,25 +23,24 @@ public class BookingMapper {
                 .build();
     }
 
-    public BookingResponseDto toDto(Booking booking) {
+    public BookingResponseDto toDto(Booking booking, User booker, Item item) {
         if (booking == null) {
-            return null;
+            throw new IllegalArgumentException("Booking не может быть null");
+        }
+        if (booker == null) {
+            throw new IllegalArgumentException("Booker не может быть null для бронирования id: " + booking.getId());
+        }
+        if (item == null) {
+            throw new IllegalArgumentException("Item не может быть null для бронирования id: " + booking.getId());
         }
 
-        // Получаем пользователя и вещь по ID
-        User booker = userRepository.findById(booking.getBookerId())
-                .orElseThrow(() -> new NotFoundException("User not found with id: " + booking.getBookerId()));
-
-        Item item = itemRepository.findById(booking.getItemId())
-                .orElseThrow(() -> new NotFoundException("Item not found with id: " + booking.getItemId()));
-
-        return new BookingResponseDto(
-                booking.getId(),
-                booking.getStart(),
-                booking.getEnd(),
-                booking.getStatus(),
-                userMapper.toDto(booker),
-                itemMapper.toDto(item)
-        );
+        return BookingResponseDto.builder()
+                .id(booking.getId())
+                .start(booking.getStart())
+                .end(booking.getEnd())
+                .status(booking.getStatus())
+                .booker(new BookingResponseDto.BookerDto(booker.getId(), booker.getName()))
+                .item(new BookingResponseDto.ItemDto(item.getId(), item.getName()))
+                .build();
     }
 }
