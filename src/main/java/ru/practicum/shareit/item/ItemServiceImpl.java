@@ -125,23 +125,6 @@ public class ItemServiceImpl implements ItemService {
         return items.stream().map(item -> itemMapper.toDto(item, null)).collect(Collectors.toList());
     }
 
-    @Override
-    @Transactional
-    public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
-        log.info("Добавление комментария к вещи id: {} пользователем id: {}", itemId, userId);
-
-        validateCommentData(commentDto);
-        User user = getUserOrThrow(userId);
-        Item item = getItemOrThrow(itemId);
-
-        validateUserCanComment(userId, itemId);
-
-        Comment comment = createAndSaveComment(commentDto, user, item);
-
-        log.info("Комментарий успешно добавлен с id: {}", comment.getId());
-        return commentMapper.toDto(comment);
-    }
-
     private void validateItemDto(ItemDto itemDto) {
         if (itemDto.getName() == null || itemDto.getName().isBlank()) {
             throw new ValidationException("Название вещи не может быть пустым");

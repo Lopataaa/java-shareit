@@ -58,4 +58,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b, Item i WHERE b.itemId = i.id AND b.id = :id AND i.ownerId = :ownerId")
     Optional<Booking> findByIdAndItemOwnerId(@Param("id") Long id, @Param("ownerId") Long ownerId);
 
+    @Query("SELECT b FROM Booking b WHERE b.bookerId = :userId " +
+            "AND b.itemId = :itemId " +
+            "AND b.status = :status " +
+            "AND b.end < :now")
+    List<Booking> findBookingsForComment(
+            @Param("userId") Long userId,
+            @Param("itemId") Long itemId,
+            @Param("status") BookingStatus status,
+            @Param("now") LocalDateTime now
+    );
 }

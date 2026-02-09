@@ -1,17 +1,24 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserMapper;
 
 @Component
+@RequiredArgsConstructor
 public class BookingMapper {
+
+    private final UserMapper userMapper;
+    private final ItemMapper itemMapper;
 
     public Booking toEntity(BookingRequestDto dto, Long bookerId) {
         if (dto == null) {
-            throw new IllegalArgumentException("BookingRequestDto не может быть null");
+            throw new IllegalArgumentException("BookingRequestDto cannot be null");
         }
 
         return Booking.builder()
@@ -25,13 +32,13 @@ public class BookingMapper {
 
     public BookingResponseDto toDto(Booking booking, User booker, Item item) {
         if (booking == null) {
-            throw new IllegalArgumentException("Booking не может быть null");
+            throw new IllegalArgumentException("Booking cannot be null");
         }
         if (booker == null) {
-            throw new IllegalArgumentException("Booker не может быть null для бронирования id: " + booking.getId());
+            throw new IllegalArgumentException("Booker cannot be null");
         }
         if (item == null) {
-            throw new IllegalArgumentException("Item не может быть null для бронирования id: " + booking.getId());
+            throw new IllegalArgumentException("Item cannot be null");
         }
 
         return BookingResponseDto.builder()
@@ -39,8 +46,8 @@ public class BookingMapper {
                 .start(booking.getStart())
                 .end(booking.getEnd())
                 .status(booking.getStatus())
-                .booker(new BookingResponseDto.BookerDto(booker.getId(), booker.getName()))
-                .item(new BookingResponseDto.ItemDto(item.getId(), item.getName()))
+                .booker(userMapper.toBookerDto(booker))
+                .item(itemMapper.toBookingItemDto(item))
                 .build();
     }
 }
