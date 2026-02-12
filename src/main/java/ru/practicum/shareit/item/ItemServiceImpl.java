@@ -14,6 +14,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.request.ItemRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     @Transactional
@@ -41,6 +43,10 @@ public class ItemServiceImpl implements ItemService {
         validateItemDto(itemDto);
 
         Item item = createItemEntity(itemDto, userId);
+
+        if (itemDto.getRequestId() != null) {
+            validateRequestExists(itemDto.getRequestId());
+        }
         Item savedItem = itemRepository.save(item);
 
         log.info("Вещь создана с id: {}", savedItem.getId());
@@ -154,6 +160,13 @@ public class ItemServiceImpl implements ItemService {
         if (!item.getOwnerId().equals(userId)) {
             log.warn("Попытка обновления чужой вещи. Вещь id: {}, пользователь id: {}", item.getId(), userId);
             throw new NotFoundException("Нельзя обновить чужую вещь");
+        }
+    }
+
+    private void validateRequestExists(Long requestId) {
+        if (!itemRequestRepository.existsById(requestId)) {
+            log.warn("Попытка создать вещь по несуществующему запросу id: {}", requestId);
+            throw new NotFoundException("Запрос с id " + requestId + " не найден");
         }
     }
 

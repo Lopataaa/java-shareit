@@ -15,4 +15,6 @@ public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> 
     // Чужие запросы
     @Query("SELECT r FROM ItemRequest r WHERE r.requestor.id <> :userId ORDER BY r.created DESC")
     List<ItemRequest> findOtherRequests(@Param("userId") Long userId, Pageable pageable);
+
+    boolean existsById(Long id);
 }
