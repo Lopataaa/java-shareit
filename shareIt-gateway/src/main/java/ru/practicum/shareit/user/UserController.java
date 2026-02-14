@@ -3,10 +3,9 @@ package ru.practicum.shareit.user;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -14,36 +13,35 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserClient userClient;
 
-    // Добавлена аннотация @Valid
     @PostMapping
-    public UserDto createUser(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> createUser(@Valid @RequestBody UserDto userDto) {
         log.info("POST /users - создание пользователя с email: {}", userDto.getEmail());
-        return userService.createUser(userDto);
+        return userClient.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
         log.info("PATCH /users/{} - обновление пользователя", userId);
-        return userService.updateUser(userId, userDto);
+        return userClient.updateUser(userId, userDto);
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable Long userId) {
+    public ResponseEntity<Object> getUserById(@PathVariable Long userId) {
         log.info("GET /users/{} - получение пользователя по ID", userId);
-        return userService.getUserById(userId);
+        return userClient.getUserById(userId);
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
+    public ResponseEntity<Object> getAllUsers() {
         log.info("GET /users - получение всех пользователей");
-        return userService.getAllUsers();
+        return userClient.getAllUsers();
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<Object> deleteUser(@PathVariable Long userId) {
         log.info("DELETE /users/{} - удаление пользователя", userId);
-        userService.deleteUser(userId);
+        return userClient.deleteUser(userId);
     }
 }

@@ -166,7 +166,6 @@ public class BookingServiceImpl implements BookingService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        // Загрузка пользователей и вещей
         Map<Long, User> users = userRepository.findAllById(userIds).stream()
                 .collect(Collectors.toMap(User::getId, Function.identity()));
 
