@@ -49,7 +49,7 @@ class BookItemRequestDtoJsonTest {
         assertThat(result).hasJsonPathStringValue("$.start");
         assertThat(result).hasJsonPathStringValue("$.end");
 
-        assertThat(result).extractingJsonPathNumberValue("$.itemId").isEqualTo(ITEM_ID);
+        assertThat(result).extractingJsonPathNumberValue("$.itemId").isEqualTo(ITEM_ID.intValue());
         assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo("2025-03-01T10:00:00");
         assertThat(result).extractingJsonPathStringValue("$.end").isEqualTo("2025-03-05T18:00:00");
     }
