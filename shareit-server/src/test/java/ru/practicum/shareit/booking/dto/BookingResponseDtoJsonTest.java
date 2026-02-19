@@ -68,19 +68,19 @@ class BookingResponseDtoJsonTest {
         assertThat(result).hasJsonPathStringValue("$.end");
         assertThat(result).hasJsonPathStringValue("$.status");
 
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(BOOKING_ID);
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo("2025-03-01T10:00:00");
         assertThat(result).extractingJsonPathStringValue("$.end").isEqualTo("2025-03-05T18:00:00");
         assertThat(result).extractingJsonPathStringValue("$.status").isEqualTo("APPROVED");
 
         assertThat(result).hasJsonPathNumberValue("$.booker.id");
         assertThat(result).hasJsonPathStringValue("$.booker.name");
-        assertThat(result).extractingJsonPathNumberValue("$.booker.id").isEqualTo(BOOKER_ID);
+        assertThat(result).extractingJsonPathNumberValue("$.booker.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.booker.name").isEqualTo(BOOKER_NAME);
 
         assertThat(result).hasJsonPathNumberValue("$.item.id");
         assertThat(result).hasJsonPathStringValue("$.item.name");
-        assertThat(result).extractingJsonPathNumberValue("$.item.id").isEqualTo(ITEM_ID);
+        assertThat(result).extractingJsonPathNumberValue("$.item.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.item.name").isEqualTo(ITEM_NAME);
     }
 
